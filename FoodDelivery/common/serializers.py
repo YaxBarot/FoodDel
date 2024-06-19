@@ -1,9 +1,14 @@
 from rest_framework import serializers
 
-from .models import AuthTokens
+from .models import  RestaurantAuthTokens
 
 
-class AuthTokenSerializer(serializers.ModelSerializer):
+# class CustomerAuthTokenSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = AuthTokens
+#         fields = "__all__"
+
+class RestaurantAuthTokenSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AuthTokens
+        model = RestaurantAuthTokens
         fields = "__all__"
