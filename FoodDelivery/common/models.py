@@ -11,9 +11,15 @@ class Audit(models.Model):
 
 
 class AuthTokens(models.Model):
+    objects = None
+
     class Meta:
         db_table = 'fd_auth_tokens'
 
     access_token = models.TextField(null=True, db_column="auth_access_token")
     refresh_token = models.TextField(null=True, db_column="auth_refresh_token")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+

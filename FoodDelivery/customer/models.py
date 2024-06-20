@@ -19,3 +19,10 @@ class Customers(Audit):
 
     # usr_profile_image = models.TextField(null=True, db_column="usr_profile_pic")
 
+class CustomerOTP(Audit):
+    class Meta:
+        db_table = "fd_customer_otp"
+
+    customer_otp_id = models.BigAutoField(primary_key=True)
+    customer_id = models.ForeignKey(Customers, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=255)
