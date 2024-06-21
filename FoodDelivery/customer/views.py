@@ -6,7 +6,7 @@ from rest_framework.response import Response
 import random
 from rest_framework import status
 from django.utils import timezone
-import traceback
+
 
 from .helpers import validate_password
 from common.helpers import save_auth_tokens
@@ -185,7 +185,6 @@ class ForgotPassword(APIView):
             else:
                 return CustomBadRequest(message=NEW_PASSWORD_DOESNT_MATCH)
         except Exception as e:
-            traceback.print_exc()
             return GenericException()
 
 
