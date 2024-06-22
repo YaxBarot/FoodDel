@@ -5,6 +5,7 @@ INTERNAL_SERVER_ERROR = "There is some issue, Please try again later."
 
 
 TOKEN_EXPIRED = "Your login session is expired please try again"
+OTP_EXPIRED = "your otp is expired"
 
 USER_REGISTERED_SUCCESSFULLY = "You have successfully registered"
 BAD_REQUEST = "Some required fields missing"
