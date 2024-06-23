@@ -1,6 +1,6 @@
 from django.db import models
 
-from FoodDel.FoodDelivery.restaurant.models import RestaurantProfile
+from restaurant.models import RestaurantProfile
 
 
 class MenuCategory(models.Model):

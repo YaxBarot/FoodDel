@@ -40,7 +40,7 @@ def token_decode(token):
     try:
         claims = jwt.decode(token, settings.JWT_SECRET, algorithms=settings.JWT_ALGORITHM)
 
-        if not AuthTokens.objects.filter(Q(access_token=token) | Q(refresh_token=token)).exists():
+        if not CustomerAuthTokens.objects.filter(Q(access_token=token) | Q(refresh_token=token)).exists():
             raise AuthenticationFailed(detail=TOKEN_EXPIRED)
 
         if "user_id" not in claims:

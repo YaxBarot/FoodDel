@@ -1,4 +1,4 @@
-from common.serializers import RestaurantAuthTokenSerializer
+from .serializers import CustomerAuthTokenSerializer
 
 
 from exceptions.generic import CustomBadRequest
@@ -10,7 +10,7 @@ from django.core import mail
 import re
 
 def save_auth_tokens(authentication_tokens):
-    auth_token_serializer = AuthTokenSerializer(data=authentication_tokens)
+    auth_token_serializer = CustomerAuthTokenSerializer(data=authentication_tokens)
     if auth_token_serializer.is_valid():
         auth_token_serializer.save()
 
