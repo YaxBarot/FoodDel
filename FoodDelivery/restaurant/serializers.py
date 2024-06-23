@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import RestaurantOTP, RestaurantProfile, RestaurantOTP
 
 
-#from administrator.models import Holidays
+
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
