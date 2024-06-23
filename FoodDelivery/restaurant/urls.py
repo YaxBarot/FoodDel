@@ -2,7 +2,7 @@ from django.urls import path
 from .views import ForgotPassword, OTPVerification, Registration,Logout, Login, ResetPassword
 #,  OTPVerification, ResetPassword, ForgotPassword, AllHolidays
 
-app_name = "seller"
+app_name = "Restaurant"
 
 urlpatterns = [
     path("registration/", Registration.as_view()),
