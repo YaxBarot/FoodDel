@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from common.constants import TOKEN_EXPIRED
-from .common.models import AuthTokens
+from .common.models import CustomerAuthTokens
 from customer.models import Customers
 from exceptions.generic import GenericException
 
@@ -40,7 +40,7 @@ def token_decode(token):
     try:
         claims = jwt.decode(token, settings.JWT_SECRET, algorithms=settings.JWT_ALGORITHM)
 
-        if not AuthTokens.objects.filter(Q(access_token=token) | Q(refresh_token=token)).exists():
+        if not CustomerAuthTokens.objects.filter(Q(access_token=token) | Q(refresh_token=token)).exists():
             raise AuthenticationFailed(detail=TOKEN_EXPIRED)
 
         if "user_id" not in claims:
