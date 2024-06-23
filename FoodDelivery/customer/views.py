@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from .helpers import validate_password
 from common.helpers import save_auth_tokens
-from common.models import AuthTokens
+from common.models import CustomerAuthTokens
 from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 from .models import Customers, CustomerOTP
 
@@ -76,7 +76,7 @@ class Logout(APIView):
     def post(request):
         try:
             token = request.headers.get("authorization").split(" ")[1]
-            AuthTokens.objects.filter(access_token=token).delete()
+            CustomerAuthTokens.objects.filter(access_token=token).delete()
             return GenericSuccessResponse(message=USER_LOGGED_OUT_SUCCESSFULLY)
         except Exception as e:
             return GenericException()
