@@ -1,5 +1,9 @@
 from django.urls import path
 
+from .homepage import ShowRestaurantList
+
+
+
 from .views import Registration, Login, Logout, OTPVerification, ResetPassword, ForgotPassword
 
 
@@ -10,4 +14,5 @@ urlpatterns = [
     path("reset_password/", ResetPassword.as_view()),
     path("forgot_password/", ForgotPassword.as_view()),
     path("logout/", Logout.as_view()),
+    path("showrestaurantlist/", ShowRestaurantList.as_view())
 ]

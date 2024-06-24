@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import ForgotPassword, OTPVerification, Registration,Logout, Login, ResetPassword
-#,  OTPVerification, ResetPassword, ForgotPassword, AllHolidays
+
 
 app_name = "Restaurant"
 
@@ -11,5 +11,5 @@ urlpatterns = [
     path("resetpassword/", ResetPassword.as_view()),
     path("forgotpassword/", ForgotPassword.as_view()),
     path("logout/", Logout.as_view()),
-    # path('allholidays/', AllHolidays.as_view())
+
 ]
