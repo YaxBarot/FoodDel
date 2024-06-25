@@ -8,6 +8,7 @@ TOKEN_EXPIRED = "Your login session is expired please try again"
 OTP_EXPIRED = "your otp is expired"
 
 USER_REGISTERED_SUCCESSFULLY = "You have successfully registered"
+CATEGORY_CREATED_SUCCESSFULLY = "You have successfully created category"
 BAD_REQUEST = "Some required fields missing"
 EMAIL_ALREADY_EXISTS = "Please enter a different email"
 MOBILE_NO_ALREADY_EXISTS = "Please enter a different mobile no"

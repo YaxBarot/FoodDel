@@ -2,7 +2,6 @@ from django.db import models
 
 from restaurant.models import RestaurantProfile
 
-
 class MenuCategory(models.Model):
     class Meta:
         db_table = 'fd_menu_category'
