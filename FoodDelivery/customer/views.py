@@ -1,30 +1,39 @@
 import re
+import random
+
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
-import random
+
 from rest_framework import status
 from django.utils import timezone
 
 
-from .helpers import validate_password
+
+
 from common.helpers import save_auth_tokens
 from common.models import CustomerAuthTokens
-from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
-from .models import Customers, CustomerOTP
-
-from exceptions.generic import CustomBadRequest, BadRequest, GenericException
-from exceptions.generic_response import GenericSuccessResponse
 from common.constants import (PASSWORD_LENGTH_SHOULD_BE_BETWEEN_8_TO_20, PASSWORD_MUST_HAVE_ONE_NUMBER,
                               PASSWORD_MUST_HAVE_ONE_SMALLERCASE_LETTER, PASSWORD_MUST_HAVE_ONE_UPPERCASE_LETTER,
                               PASSWORD_MUST_HAVE_ONE_SPECIAL_CHARACTER, EMAIL_ALREADY_EXISTS,
                               USER_REGISTERED_SUCCESSFULLY, BAD_REQUEST,
                               USER_LOGGED_OUT_SUCCESSFULLY, YOUR_PASSWORD_UPDATED_SUCCESSFULLY, OTP_DOESNT_MATCH,
-                              OTP_SENT_SUCCESSFULLY, MOBILE_NO_ALREADY_EXISTS,
+                              MOBILE_NO_ALREADY_EXISTS,
                               INCORRECT_PASSWORD, WRONG_EMAIL, NEW_PASSWORD_DOESNT_MATCH, OTP_EXPIRED)
+
+from menu.serializers import RestaurantMenuSerializer
+from menu.models import MenuItem
+
+from exceptions.generic import CustomBadRequest, BadRequest, GenericException
+from exceptions.generic_response import GenericSuccessResponse
+
 from security.customer_authorization import get_authentication_tokens, CustomerJWTAuthentication
+
 from .helpers import send_mail
+from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
+from .models import Customers, CustomerOTP
+from .helpers import validate_password
 
 
 class Registration(APIView):
@@ -103,15 +112,17 @@ class Login(APIView):
 
 
 class ResetPassword(APIView):
+    authentication_classes = [CustomerJWTAuthentication]
+
     @staticmethod
     def patch(request):
         try:
-            if "email" not in request.data or "new_password" not in request.data or "confirm_password" not in request.data:
+            customer = request.user
+            if "new_password" not in request.data or "confirm_password" not in request.data:
                 raise CustomBadRequest(message=BAD_REQUEST)
             new_password = request.data["new_password"]
             confirm_password = request.data["confirm_password"]
-            email = request.data["email"]
-            customer = Customers.objects.get(email=email, is_deleted=False)
+            customer = Customers.objects.get(email=customer.email, is_deleted=False)
             if not (check_password == customer.password):
                 if new_password == confirm_password:
                     if validate_password(confirm_password):
@@ -169,7 +180,7 @@ class ForgotPassword(APIView):
             resetpassword_serializer = ResetPasswordSerializer(data=request.data)
             customer = Customers.objects.get(email=email, is_deleted=False)
             customer_otp = CustomerOTP.objects.filter(customer_id=customer.id).last()
-            print("customer otp", customer_otp.created_at)
+ 
             if new_password == confirm_password:
                 if (timezone.now() - customer_otp.created_at < timezone.timedelta(minutes=2)):
                     if customer_otp.otp == otp:
@@ -188,3 +199,20 @@ class ForgotPassword(APIView):
             return GenericException()
 
 
+class GetRestaurantMenu(APIView):
+    @staticmethod
+    def get(request):
+        try:
+            if "restaurant_id" not in request.data:
+                raise CustomBadRequest(message=BAD_REQUEST)
+            
+            restaurant_id = request.data["restaurant_id"]
+            
+            restaurant_menu = MenuItem.objects.filter(restaurant_id=restaurant_id)
+
+            restaurant_menu_serializer = RestaurantMenuSerializer(restaurant_menu, many=True) 
+           
+            return GenericSuccessResponse(restaurant_menu_serializer.data) 
+       
+        except Exception as e:
+            GenericException() 

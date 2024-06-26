@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password, check_password
+
 import datetime
 import smtplib
 import traceback
@@ -17,11 +18,11 @@ from security.restaurant_authorization import get_restaurant_authentication_toke
 
 from exceptions.generic_response import GenericSuccessResponse
 
+from exceptions.generic import CustomBadRequest,GenericException
+
 from common.models import RestaurantAuthTokens
 
 from common.helpers import send_mail, validate_password
-
-from exceptions.generic import CustomBadRequest,GenericException
 
 from common.constants import EMAIL_ALREADY_EXISTS, USER_REGISTERED_SUCCESSFULLY, BAD_REQUEST, \
     USER_LOGGED_OUT_SUCCESSFULLY, USER_LOGGED_IN_SUCCESSFULLY, INCORRECT_PASSWORD, WRONG_EMAIL, \
@@ -30,12 +31,15 @@ from common.constants import EMAIL_ALREADY_EXISTS, USER_REGISTERED_SUCCESSFULLY,
     PASSWORD_MUST_HAVE_ONE_NUMBER, PASSWORD_MUST_HAVE_ONE_SMALLERCASE_LETTER, PASSWORD_MUST_HAVE_ONE_UPPERCASE_LETTER, \
     PASSWORD_MUST_HAVE_ONE_SPECIAL_CHARACTER
 
-from .models import RestaurantOTP, RestaurantProfile
+
+from .models import RestaurantOTP, RestaurantProfile, RestaurantType
 
 from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 
 
+
 # Create your views here.
+
 
 class Registration(APIView):
     @staticmethod
@@ -130,19 +134,23 @@ class Login(APIView):
 
 
 class ResetPassword(APIView):
+    authentication_classes = [RestaurantJWTAuthentication]
+
     @staticmethod
     def patch(request):
         try:
-            if "email" not in request.data or "new_password1" not in request.data or "new_password2" not in request.data:
+            restaurant = request.user
+
+            if "new_password1" not in request.data or "new_password2" not in request.data:
                 raise CustomBadRequest(message=BAD_REQUEST)
             
             new_password1 = request.data["new_password1"]
             new_password2 = request.data["new_password2"]
-            email = request.data["email"]
+
            
             del request.data["new_password1"]
             del request.data["new_password2"]
-            del request.data["email"]
+
 
             resetpassword_serializer = ResetPasswordSerializer(data=request.data)
            
@@ -150,7 +158,7 @@ class ResetPassword(APIView):
                 raise CustomBadRequest(message=BAD_REQUEST)
            
             else:
-                restaurant = RestaurantProfile.objects.get(email=email, is_deleted=False)
+                restaurant = RestaurantProfile.objects.get(email=restaurant.email, is_deleted=False)
            
                 if check_password(request.data["password"], restaurant.password):
            
@@ -255,3 +263,14 @@ class ForgotPassword(APIView):
 
 
 
+class GetRestaurantType(APIView):
+    @staticmethod
+    def get(request):
+        try:
+            restaurant_type_choices = RestaurantType.choices()
+            response = {choice[0]: choice[1] for choice in restaurant_type_choices}
+            print(response)
+            return GenericSuccessResponse(response)
+        except:
+            GenericException()
+        
