@@ -20,3 +20,4 @@ class OTPVerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RestaurantOTP
         fields = ["restaurant_id","otp"]
+

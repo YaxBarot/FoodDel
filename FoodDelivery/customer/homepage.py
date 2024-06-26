@@ -1,10 +1,11 @@
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from restaurant.models import RestaurantProfile
 from security.customer_authorization import CustomerJWTAuthentication
 from exceptions.generic_response import GenericSuccessResponse
-
+from exceptions.generic import GenericException
 from .serializers import RestaurantListSerializer
 
 class ShowRestaurantList(APIView):
@@ -12,6 +13,7 @@ class ShowRestaurantList(APIView):
 
     @staticmethod
     def get(request):
+        try:
             if 'Restaurant_type' in request.data and request.data['Restaurant_type']!='':
                 restaurant_list = RestaurantProfile.objects.filter(Restaurant_type='RESTRAUNT').values()
            
@@ -29,4 +31,6 @@ class ShowRestaurantList(APIView):
                 counter += 1
 
             return GenericSuccessResponse(response)
-        
+        except Exception as e:
+            return GenericException()
+            
