@@ -1,5 +1,6 @@
 from django.db import models
 
+from menu.models import MenuItem
 from common.models import Audit
 
 
@@ -26,3 +27,12 @@ class CustomerOTP(Audit):
     customer_otp_id = models.BigAutoField(primary_key=True)
     customer_id = models.ForeignKey(Customers, on_delete=models.CASCADE)
     otp = models.CharField(max_length=255)
+
+class Cart(Audit):
+    class Meta:
+        db_table = "fd_cart"
+    customer_cart_id = models.BigAutoField(primary_key=True)
+    id = models.ForeignKey(Customers, on_delete=models.CASCADE)
+    menu_item = models.JSONField()
+    total_price = models.CharField(max_length=255,default=0)
+    status = models.BooleanField(default=0)

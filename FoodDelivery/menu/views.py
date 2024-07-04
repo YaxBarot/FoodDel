@@ -79,6 +79,7 @@ class MenuCategoryDelete(APIView):
         except Exception as e:
             print(f"An error occurred: {e}")
             return GenericException()
+        
 class MenuItemCreate(APIView):
     authentication_classes = [RestaurantJWTAuthentication]
 
@@ -96,7 +97,7 @@ class MenuItemCreate(APIView):
 
             if menu_serializer.is_valid(raise_exception=True):
                 menu_item = menu_serializer.save()
-                return GenericSuccessResponse({'item_id': menu_item.id, 'name': menu_item.name}, message="Item created successfully")
+                return GenericSuccessResponse({'item_id': menu_item.menu_id, 'name': menu_item.name}, message="Item created successfully")
             else:
                 return CustomBadRequest(message="Invalid data")
         except ValidationError as e:
@@ -117,7 +118,7 @@ class MenuItemUpdate(APIView):
 
             if menu_serializer.is_valid(raise_exception=True):
                 menu_serializer.save()
-                return GenericSuccessResponse({'item_id': menu_item.id, 'name': menu_item.name}, message="Item updated successfully")
+                return GenericSuccessResponse({'item_id': menu_item.menu_id, 'name': menu_item.name}, message="Item updated successfully")
             else:
                 return CustomBadRequest(message="Invalid data")
         except MenuItem.DoesNotExist:
@@ -133,7 +134,7 @@ class MenuItemDelete(APIView):
 
     def delete(self, request, menu_id):
         try:
-            menu_item = MenuItem.objects.get(id=menu_id)
+            menu_item = MenuItem.objects.get(menu_id=menu_id)
             menu_item.delete()
             return GenericSuccessResponse(message="Item deleted successfully")
         except MenuItem.DoesNotExist:
