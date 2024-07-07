@@ -1,6 +1,8 @@
 import json
 
-from customer.serializers import CartSerializer, JSONMenuSerializer
+from restaurant.models import RestaurantProfile
+from customer.serializers import CartSerializer, JSONMenuSerializer, RegistrationSerializer
+from restaurant.serializers import RegistrationSerializer as RestrauntRegistrationSerializer
 from exceptions.generic_response import GenericSuccessResponse
 from menu.serializers import MenuItemSerializer
 from exceptions.generic import CustomBadRequest
@@ -14,7 +16,7 @@ from django.core import serializers
 from exceptions.generic import GenericException
 from menu.models import MenuItem
 
-from customer.models import Cart
+from customer.models import Cart, Customers
 
 from customer.serializers import ShowCartSerializer
 
@@ -49,6 +51,7 @@ class AddToCart(APIView):
 
             request.data["menu_item"] = {json_menu_serializer_data.data['menu_id']:json_menu_serializer_data.data}
             request.data["total_price"] =  json_menu_serializer_data.data['price']
+            request.data["restaurant_id"] = menu_item.restaurant_id.restaurant_id
             del request.data["menu_id"]
 
             cart_serializer = CartSerializer(data=request.data)
@@ -69,6 +72,7 @@ class AddToCart(APIView):
             return CustomBadRequest(message=e.detail)
 
         except Exception as e:
+
             return GenericException()
 
     def patch(self, request):
@@ -80,9 +84,9 @@ class AddToCart(APIView):
                 return CustomBadRequest(message="Menu ID and quantity are required")
             
             cart = Cart.objects.filter(id=request.data["id"]).first()
-
+            
             if cart.menu_item.get(str(request.data["menu_id"])):
-                
+                menu_item = MenuItem.objects.get(menu_id=request.data["menu_id"])
                 if request.data["quantity"] == 0:   
                    value = cart.menu_item.pop(str(request.data["menu_id"]))
                    request.data["menu_item"] = cart.menu_item
@@ -99,6 +103,7 @@ class AddToCart(APIView):
                     total_price += price * quantity
                 
                 request.data["total_price"] = total_price
+                request.data["restaurant_id"] = menu_item.restaurant_id.restaurant_id
                 del request.data["quantity"]
                 
                 cart_serializer = CartSerializer(data=request.data)
@@ -106,7 +111,7 @@ class AddToCart(APIView):
                 if cart_serializer.is_valid(raise_exception=True):
                     cart = cart_serializer.update(cart,cart_serializer.validated_data) 
                     serialized_cart = CartSerializer(cart)
-                    \
+                    
                     return GenericSuccessResponse(serialized_cart.data)
            
             else:
@@ -132,7 +137,7 @@ class AddToCart(APIView):
                     total_price  = total_price + float(value[1]["price"]) * int(value[1]["quantity"])
                 
                 request.data["total_price"] = total_price
-
+                request.data["restaurant_id"] = menu_item.restaurant_id.restaurant_id
                 del request.data["menu_id"]
                 del request.data["quantity"]
                 request.data["menu_item"] = cart.menu_item
@@ -156,7 +161,7 @@ class AddToCart(APIView):
             return CustomBadRequest(message=e.detail)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+
             return CustomBadRequest(message="An error occurred")
 
     
@@ -175,7 +180,7 @@ class DeleteInCart(APIView):
             return GenericSuccessResponse({"error": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+
             return GenericSuccessResponse({"error": "Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -186,10 +191,48 @@ class GetCart(APIView):
         try:
             customer = request.user
             cart_items = Cart.objects.filter(id=customer.id)
-
+            
             show_cart_serializer = ShowCartSerializer(cart_items, many=True)
 
             return Response(show_cart_serializer.data)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class Cartcheckout(APIView):
+    authentication_classes = [CustomerJWTAuthentication]
+
+    def patch(self, request):
+        try:
+            customer = request.user
+            request.data["id"] = customer.id
+
+            if "customer_cart_id" not in request.data:
+                return CustomBadRequest(message="customer_cart_id is not in request.data")
+
+            cart = Cart.objects.get(customer_cart_id=request.data["customer_cart_id"])
+            total_price = cart.total_price
+
+            customer = Customers.objects.get(id=request.data["id"])
+          
+            new_customer_credit = float(customer.credit) - float(total_price)
+            customer.credit = new_customer_credit
+
+            registration_serializer = RegistrationSerializer(customer, data=request.data, partial=True)
+
+
+            if registration_serializer.is_valid():
+
+                registration_serializer.save()
+
+                return Response({"message": "Restaurant and custommer credit and order status updated successfully"}, status=status.HTTP_200_OK)
+
+
+        except Cart.DoesNotExist:
+            return Response({"message": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Customers.DoesNotExist:
+            return Response({"message": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

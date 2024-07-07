@@ -26,7 +26,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ["id" , "menu_item" , "total_price"]
+        fields = "__all__"
 
 class ShowCartSerializer(serializers.ModelSerializer):
     class Meta:

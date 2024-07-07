@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+from django.db.models import Q
+from customer.serializers import CartSerializer
+from customer.models import Cart, Customers
+from security.customer_authorization import CustomerJWTAuthentication
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -34,7 +39,7 @@ from common.constants import EMAIL_ALREADY_EXISTS, USER_REGISTERED_SUCCESSFULLY,
 
 from .models import RestaurantOTP, RestaurantProfile, RestaurantType
 
-from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
+from .serializers import CartItemSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 
 
 
@@ -269,8 +274,98 @@ class GetRestaurantType(APIView):
         try:
             restaurant_type_choices = RestaurantType.choices()
             response = {choice[0]: choice[1] for choice in restaurant_type_choices}
-            print(response)
+          
             return GenericSuccessResponse(response)
         except:
             GenericException()
         
+class CartApproval(APIView):
+    authentication_classes = [RestaurantJWTAuthentication]
+
+    
+    def get(self, request):
+        try:
+
+            if "customer_cart_id" not in request.data:
+                raise CustomBadRequest(message="BAD_REQUEST")
+       
+            cart = Cart.objects.get(customer_cart_id = request.data["customer_cart_id"])
+  
+            cart_request_dict={}
+            cart_request_dict = {
+                    "restaurant_id": cart.restaurant_id.restaurant_id,
+                    "id": cart.id.id,
+                    "menu_item": cart.menu_item,
+                    "total_price": cart.total_price,
+                    "is_ordered": cart.is_ordered,
+                   
+                }
+
+            cart_serializer = CartItemSerializer(cart_request_dict)
+                
+            return Response(cart_serializer.data, status=status.HTTP_200_OK)
+
+        except Cart.DoesNotExist:
+            return Response({"message": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            
+            GenericException()
+        
+
+    def patch(self, request):
+        try:
+            restaurant = request.user
+
+
+            if "customer_cart_id" not in request.data or "is_approved" not in request.data:
+                raise CustomBadRequest(message="BAD_REQUEST")
+
+
+            cart = Cart.objects.get(customer_cart_id=request.data["customer_cart_id"], restaurant_id=restaurant.restaurant_id, is_deleted=False)
+
+            if request.data["is_approved"] == 1:
+                cart.is_ordered = True
+                cart_serializer = CartSerializer(cart, data={"is_ordered": cart.is_ordered}, partial=True)
+
+                restaurant = RestaurantProfile.objects.get(restaurant_id = cart.restaurant_id.restaurant_id)
+                new_restaurant_credit =  float(restaurant.credit) + float(cart.total_price)
+                restaurant.credit = new_restaurant_credit
+                
+                restaurant_serializer = RegistrationSerializer(restaurant,data = request.data, partial=True)
+
+                cart.is_ordered = True
+                cart_serializer = CartSerializer(cart,data = request.data, partial=True)
+                
+                if restaurant_serializer.is_valid() and cart_serializer.is_valid():
+                    restaurant_serializer.save()
+                    cart_serializer.save()
+                    return Response(cart_serializer.data, status=status.HTTP_200_OK)
+                    
+            else:
+                cart.is_deleted = True
+                cart_serializer = CartSerializer(cart, data={"is_deleted": cart.is_deleted}, partial=True)
+
+                total_price = cart.total_price
+
+                customer = Customers.objects.get(id=cart.id.id)
+
+                new_customer_credit = float(customer.credit) + float(total_price)
+                customer.credit = new_customer_credit
+
+                registration_serializer = RegistrationSerializer(customer, data=request.data, partial=True)
+                if registration_serializer.is_valid() and cart_serializer.is_valid() :
+
+                    registration_serializer.save()
+                    cart_serializer.save()  
+                    return Response({"message": "custommer credit and order status updated successfully"}, status=status.HTTP_200_OK)
+
+                
+            
+        except Cart.DoesNotExist:
+            return Response({"message": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        except CustomBadRequest as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return GenericException()
+        
+  

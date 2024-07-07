@@ -19,7 +19,7 @@ class Customers(Audit):
 
     dob = models.DateField(db_column="usr_dob", null=True)
     credit = models.CharField(max_length=255,default="1000")
-    # usr_profile_image = models.TextField(null=True, db_column="usr_profile_pic")
+
 
 class CustomerOTP(Audit):
     class Meta:
