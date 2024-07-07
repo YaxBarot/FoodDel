@@ -36,7 +36,7 @@ class RestaurantProfile(Audit):
     password = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     Restaurant_type = models.CharField(choices=RestaurantType.choices(), max_length=255, default=RestaurantType.RESTRAUNT.name)
-   
+    credit = models.CharField(max_length=255,default="0")
     email = models.EmailField(unique=True)
 
 

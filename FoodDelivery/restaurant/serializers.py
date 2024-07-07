@@ -1,3 +1,4 @@
+from customer.models import Cart
 from rest_framework import serializers
 
 from .models import RestaurantOTP, RestaurantProfile, RestaurantOTP
@@ -21,3 +22,10 @@ class OTPVerificationSerializer(serializers.ModelSerializer):
         model = RestaurantOTP
         fields = ["restaurant_id","otp"]
 
+class CartItemSerializer(serializers.Serializer):
+    restaurant_id = serializers.IntegerField()
+    id = serializers.IntegerField()
+    menu_item = serializers.JSONField()
+    total_price = serializers.CharField(max_length=255)
+    is_ordered = serializers.BooleanField()
+    
