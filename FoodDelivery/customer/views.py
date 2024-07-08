@@ -208,7 +208,7 @@ class GetRestaurantMenu(APIView):
             
             restaurant_id = request.data["restaurant_id"]
             
-            restaurant_menu = MenuItem.objects.filter(restaurant_id=restaurant_id)
+            restaurant_menu = MenuItem.objects.filter(restaurant_id=restaurant_id, is_deleted=False)
 
             restaurant_menu_serializer = RestaurantMenuSerializer(restaurant_menu, many=True) 
            

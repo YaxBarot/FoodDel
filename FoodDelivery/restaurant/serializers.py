@@ -22,6 +22,11 @@ class OTPVerificationSerializer(serializers.ModelSerializer):
         model = RestaurantOTP
         fields = ["restaurant_id","otp"]
 
+class OperationalStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RestaurantProfile
+        fields = ["operational_status"]
+
 class CartItemSerializer(serializers.Serializer):
     restaurant_id = serializers.IntegerField()
     id = serializers.IntegerField()

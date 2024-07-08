@@ -38,6 +38,7 @@ class RestaurantProfile(Audit):
     Restaurant_type = models.CharField(choices=RestaurantType.choices(), max_length=255, default=RestaurantType.RESTRAUNT.name)
     credit = models.CharField(max_length=255,default="0")
     email = models.EmailField(unique=True)
+    operational_status = models.BooleanField(default=0)
 
 
 class RestaurantOTP(Audit):

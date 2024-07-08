@@ -39,7 +39,7 @@ from common.constants import EMAIL_ALREADY_EXISTS, USER_REGISTERED_SUCCESSFULLY,
 
 from .models import RestaurantOTP, RestaurantProfile, RestaurantType
 
-from .serializers import CartItemSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
+from .serializers import CartItemSerializer, OperationalStatusSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 
 
 
@@ -275,10 +275,59 @@ class GetRestaurantType(APIView):
             restaurant_type_choices = RestaurantType.choices()
             response = {choice[0]: choice[1] for choice in restaurant_type_choices}
           
-            return GenericSuccessResponse(response)
+            return GenericSuccessResponse(response)        
         except:
             GenericException()
         
+class OperationalStatus(APIView):
+
+    authentication_classes = [RestaurantJWTAuthentication]
+
+    def get(self, request):
+        try:
+            restaurant = request.user
+
+            restaurant = RestaurantProfile.objects.get(restaurant_id=restaurant.restaurant_id)
+
+            operational_status_serializer = OperationalStatusSerializer(restaurant)
+
+            return GenericSuccessResponse(data=operational_status_serializer.data)
+        except RestaurantProfile.DoesNotExist:
+            return Response({"message": "RestaurantProfile not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            traceback.print_exc()
+            return GenericException()
+
+
+    def patch(self, request):
+        try:
+            restaurant = request.user
+
+            if "operational_status" not in request.data:
+                raise CustomBadRequest(message="BAD_REQUEST")
+            
+            operational_status_serializer = OperationalStatusSerializer(data=request.data)
+            restaurant = RestaurantProfile.objects.get(restaurant_id=restaurant.restaurant_id)
+
+            print(restaurant)
+            print(request.data)
+            print(operational_status_serializer)    
+
+            if operational_status_serializer.is_valid():
+                print("Valid data received")
+                operational_status_serializer.update(restaurant, operational_status_serializer.validated_data)
+              
+                return GenericSuccessResponse('e', message="Your operational status has been updated successfully.")
+            
+            else:
+                return Response(operational_status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except:
+            GenericException()
+
+
+
+
 class CartApproval(APIView):
     authentication_classes = [RestaurantJWTAuthentication]
 
@@ -307,8 +356,8 @@ class CartApproval(APIView):
 
         except Cart.DoesNotExist:
             return Response({"message": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+    
         except:
-            
             GenericException()
         
 
@@ -319,7 +368,6 @@ class CartApproval(APIView):
 
             if "customer_cart_id" not in request.data or "is_approved" not in request.data:
                 raise CustomBadRequest(message="BAD_REQUEST")
-
 
             cart = Cart.objects.get(customer_cart_id=request.data["customer_cart_id"], restaurant_id=restaurant.restaurant_id, is_deleted=False)
 
