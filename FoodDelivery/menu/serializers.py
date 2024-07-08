@@ -17,3 +17,10 @@ class RestaurantMenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = "__all__"
+
+class MenuItemavailablitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItem
+        fields = ["is_deleted"]
+
+

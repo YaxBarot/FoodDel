@@ -1,15 +1,16 @@
 from django.db import models
 
+from common.models import Audit
 from restaurant.models import RestaurantProfile
 
-class MenuCategory(models.Model):
+class MenuCategory(Audit):
     class Meta:
         db_table = 'fd_menu_category'
     name = models.CharField(max_length=100)
     category_id = models.BigAutoField(primary_key=True)
 
 
-class MenuItem(models.Model):
+class MenuItem(Audit):
     class Meta:
         db_table = 'fd_menu_item'
     restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
@@ -18,3 +19,4 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+

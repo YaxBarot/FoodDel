@@ -1,9 +1,10 @@
+import traceback
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import MenuCategory, MenuItem
-from .serializers import MenuCategorySerializer, MenuItemSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, MenuItemavailablitySerializer
 from exceptions.generic import CustomBadRequest, BadRequest, GenericException
 from exceptions.generic_response import GenericSuccessResponse
 
@@ -142,3 +143,37 @@ class MenuItemDelete(APIView):
         except Exception as e:
             print(f"An error occurred: {e}")
             return GenericException()
+
+class MenuItemavailablity(APIView):
+    authentication_classes = [RestaurantJWTAuthentication]
+
+    def patch(self, request, menu_id):
+        try:
+            restaurant = request.user
+            if "item_availability" not in request.data:
+                return CustomBadRequest(message="item_availability is required")
+            if request.data["item_availability"] == 0:
+                request.data["is_deleted"] = 1
+            else:
+                request.data["is_deleted"] = 0
+
+            del request.data["item_availability"]
+
+            menu_item = MenuItem.objects.get(menu_id=menu_id, restaurant_id = restaurant.restaurant_id)
+            menu_Item_availablity_serializer = MenuItemavailablitySerializer(data=request.data)
+
+            if menu_Item_availablity_serializer.is_valid(raise_exception=True):
+                menu_Item_availablity_serializer.update(menu_item, menu_Item_availablity_serializer.validated_data)
+                return GenericSuccessResponse(menu_Item_availablity_serializer.data, message="Item_availability updated successfully")
+            else:
+                return CustomBadRequest(message="Invalid data")
+            
+        except MenuItem.DoesNotExist:
+            return CustomBadRequest(message="Item not found")
+        except ValidationError as e:
+            return CustomBadRequest(message=e.detail)
+        except Exception as e:
+            traceback.print_exc()
+            return GenericException()
+
+        
