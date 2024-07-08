@@ -39,7 +39,7 @@ from common.constants import EMAIL_ALREADY_EXISTS, USER_REGISTERED_SUCCESSFULLY,
 
 from .models import RestaurantOTP, RestaurantProfile, RestaurantType
 
-from .serializers import CartItemSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
+from .serializers import CartItemSerializer, OperationalStatusSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 
 
 
@@ -279,6 +279,22 @@ class GetRestaurantType(APIView):
         except:
             GenericException()
         
+class OperationalStatus(APIView):
+
+    authentication_classes = [RestaurantJWTAuthentication]
+
+    @staticmethod
+    def patch(self, request):
+        
+        restaurant = request.user
+        if "operational_status" not in request.data:
+            raise CustomBadRequest(message="BAD_REQUEST")
+        
+        restaurant = RestaurantProfile.objects.get(restaurant_id = restaurant.restaurant_id)
+        restaurant.operationalstatus = int(request.data["operational_status"])
+        operational_status_serializer = OperationalStatusSerializer(restaurant,data={"operational_status": restaurant.operational_status}, partial=True)
+        if operational_status_serializer.is_valid:
+            operational_status_serializer.update()
 class CartApproval(APIView):
     authentication_classes = [RestaurantJWTAuthentication]
 
@@ -319,7 +335,6 @@ class CartApproval(APIView):
 
             if "customer_cart_id" not in request.data or "is_approved" not in request.data:
                 raise CustomBadRequest(message="BAD_REQUEST")
-
 
             cart = Cart.objects.get(customer_cart_id=request.data["customer_cart_id"], restaurant_id=restaurant.restaurant_id, is_deleted=False)
 
