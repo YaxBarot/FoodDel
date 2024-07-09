@@ -2,13 +2,11 @@ from django.urls import path
 
 from .cart import AddToCart, Cartcheckout, DeleteInCart, GetCart
 
-
-
 from .homepage import ShowRestaurantList
 
-
-
 from .views import Registration, Login, Logout, OTPVerification, ResetPassword, ForgotPassword,GetRestaurantMenu
+
+from .ratings import RateRestaurant
 
 
 urlpatterns = [
@@ -23,6 +21,8 @@ urlpatterns = [
     path("addtocart/", AddToCart.as_view()),
     path('deleteincart/<int:cart_id>/', DeleteInCart.as_view()),
     path("getcart/", GetCart.as_view()),
-    path("cartcheckout/", Cartcheckout.as_view())
+    path("cartcheckout/", Cartcheckout.as_view()),
+
+    path("raterestaurant/",RateRestaurant.as_view())
  
 ]

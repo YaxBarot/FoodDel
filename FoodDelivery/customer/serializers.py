@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Cart, Customers, CustomerOTP
+from .models import Cart, Customers, CustomerOTP, RatingHistory
 from restaurant.models import RestaurantProfile
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -41,3 +41,10 @@ class JSONMenuSerializer(serializers.Serializer):
     description = serializers.CharField(max_length=500, allow_blank=True, allow_null=True)
     price = serializers.CharField(max_length=100)
     quantity     = serializers.IntegerField()
+
+
+
+class RatingHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RatingHistory
+        fields = "__all__"

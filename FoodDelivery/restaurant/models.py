@@ -1,4 +1,3 @@
-import datetime
 from enum import Enum
 from django.db import models
 from common.models import Audit
@@ -25,20 +24,26 @@ class RestaurantType(Enum):
     @classmethod
     def choices(cls):
         return [(type.name, type.value) for type in cls]
-    
+
+
 class RestaurantProfile(Audit):
     class Meta:
         db_table = "fd_restaurant_profile"
 
     restaurant_id = models.BigAutoField(primary_key=True)
-   
+
     restaurant_name = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
-    Restaurant_type = models.CharField(choices=RestaurantType.choices(), max_length=255, default=RestaurantType.RESTRAUNT.name)
-    credit = models.CharField(max_length=255,default="0")
+    Restaurant_type = models.CharField(choices=RestaurantType.choices(), max_length=255,
+                                       default=RestaurantType.RESTRAUNT.name)
+    credit = models.CharField(max_length=255, default="0")
     email = models.EmailField(unique=True)
+
     operational_status = models.BooleanField(default=0)
+
+    rating = models.FloatField(default=0.0)
+    no_of_ratings = models.IntegerField(default=0)
 
 
 class RestaurantOTP(Audit):
@@ -46,10 +51,7 @@ class RestaurantOTP(Audit):
         db_table = "fd_restaurant_otp"
 
     restaurant_otp_id = models.BigAutoField(primary_key=True)
-    
+
     restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
-    
+
     otp = models.CharField(max_length=255)
-
-
-    
