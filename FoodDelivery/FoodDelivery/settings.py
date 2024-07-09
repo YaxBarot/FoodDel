@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "customer",
     "restaurant",
     "common",
-    "menu"
+    "menu",
+    "offers",
 ]
 
 MIDDLEWARE = [
@@ -82,7 +83,7 @@ WSGI_APPLICATION = "FoodDelivery.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fd',
+        'NAME': 'fdd',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
