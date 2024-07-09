@@ -83,7 +83,7 @@ WSGI_APPLICATION = "FoodDelivery.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fdd',
+        'NAME': 'fd',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',

@@ -11,4 +11,3 @@ class Offers(Audit):
     item_quantity = models.IntegerField()
     free_item = models.ForeignKey(MenuItem, related_name='free_item_id', on_delete=models.CASCADE)
     free_item_quantity = models.IntegerField()
-
