@@ -45,14 +45,10 @@ OTP_SENT_SUCCESSFULLY = "OTP sent to your email address"
 OTP_SENT_SUCCESSFULLY_TO_YOUR_EMAIL_ID = "otp sent successfully to your email id"
 OTP_DOESNT_MATCH = "otp doesnt match"
 OTP_EXPIRED = "your otp is expired"
-HOLIDAY_ADDED_SUCCESSFULLY = "holiday added successfully"
-HOLIDAY_DOES_NOT_EXIST = "holiday does not exist"
-HOLIDAY_DELETED = "holiday deleted successfully"
 
 
-ALREADY_CLOCKED_IN = "You are already clocked in"
-CLOCKED_IN_SUCCESSFULLY = "You have clocked in successfully"
-CLOCK_IN_MISSING = "You haven't clocked in yet"
-CLOCKED_OUT_SUCCESSFULLY = "You have clocked out successfully"
-ALREADY_CLOCKED_OUT = "You have already clocked out"
-
+# ratings
+NO_SUCH_RESTAURANT_EXISTS = "No such restaurant exists"
+RATING_CANNOT_BE_GIVEN = "Rating cannot be given, please order from restaurant first"
+ONE_RATING_ALLOWED = "You have already Rated this Restaurant"
+RATING_GIVEN_SUCCESSFULLY = "You have successfully rated the restaurant"

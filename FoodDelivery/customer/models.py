@@ -38,3 +38,15 @@ class Cart(Audit):
     menu_item = models.JSONField()
     total_price = models.CharField(max_length=255,default=0)
     is_ordered = models.BooleanField(default=0)
+
+
+class RatingHistory(Audit):
+    class Meta:
+        db_table = "fd_rating_history"
+
+    rating_id = models.BigAutoField(primary_key=True)
+
+    restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
+    customer_id = models.ForeignKey(Customers, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+
