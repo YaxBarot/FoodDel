@@ -15,11 +15,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.CreateModel(
             name='Offers',
+            name='Offers',
             fields=[
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('is_deleted', models.BooleanField(default=False)),
                 ('offer_id', models.BigAutoField(primary_key=True, serialize=False)),
+                ('offer_type', models.CharField(max_length=255)),
                 ('discount', models.IntegerField()),
                 ('item_quantity', models.IntegerField()),
                 ('free_item_quantity', models.IntegerField()),
