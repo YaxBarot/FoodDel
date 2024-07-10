@@ -245,15 +245,20 @@ class ApplyOffer(APIView):
 
     def get(self, request, restaurant_id):
         try:
-       
-            offer = Offers.objects.get(restaurant_id=restaurant_id)
+            print(restaurant_id)
+            offers = Offers.objects.filter(restaurant_id=restaurant_id)
 
-            offers_serializer = OffersSerializer(offer)
-            
-            return GenericSuccessResponse(offers_serializer.data, status=status.HTTP_200_OK)
+            if offers.exists():
+                offers_serializer = OffersSerializer(offers, many=True)
+                return GenericSuccessResponse(offers_serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "offer not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Offers.DoesNotExist:
             return Response({"message": "offer not found"}, status=status.HTTP_404_NOT_FOUND)
     
-        except:
-            GenericException()
+        except Exception as e:
+            return GenericException(str(e))
+        
+
+
