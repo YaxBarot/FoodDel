@@ -1,4 +1,5 @@
 from django.db import models
+from restaurant.models import RestaurantProfile
 from menu.models import MenuItem
 from common.models import Audit
 
@@ -13,3 +14,4 @@ class Offers(Audit):
     free_item_quantity = models.IntegerField()
     type = models.CharField(max_length=225)
     is_approved = models.BooleanField(default=0)
+    restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
