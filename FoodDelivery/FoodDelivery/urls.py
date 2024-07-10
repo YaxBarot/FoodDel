@@ -22,5 +22,5 @@ urlpatterns = [
     path("restaurant/", include("restaurant.urls")),
     path("customer/", include("customer.urls")),
     path("menu/", include("menu.urls")),
-    
+    path("offers/", include("offers.urls")),
 ]
