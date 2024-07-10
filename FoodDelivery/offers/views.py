@@ -18,23 +18,30 @@ class OffersCreate(APIView):
 
     def post(self, request):
         try:
+            restaurant = request.user
+            request.data["restaurant_id"] = restaurant.restaurant_id
+            print(request.data, request.data["restaurant_id"] )
             serializer = OffersSerializer(data=request.data)
+
+            
 
             if "type" not in request.data or not str(request.data["type"]).strip():
                 return CustomBadRequest(message="type is required")
 
-            if Offers.objects.filter(type=request.data["type"]).exists():
+            if Offers.objects.filter(type=request.data["type"],item_id=request.data["item_id"]).exists():
                 return CustomBadRequest(message="An offer with this item and type already exists")
 
-            if Offers.objects.filter(type=request.data["item_id"]).exists():
-                return CustomBadRequest(message="An offer with this item and type already exists")
+            if Offers.objects.filter(item_id__restaurant_id=restaurant.restaurant_id).exists():
+                
 
-            if serializer.is_valid(raise_exception=True):
-                offer = serializer.save()
-                return GenericSuccessResponse({'offer_id': offer.offer_id, 'type': offer.type},
-                                              message="Offer created successfully")
+                if serializer.is_valid(raise_exception=True):
+                    offer = serializer.save()
+                    return GenericSuccessResponse({'offer_id': offer.offer_id, 'type': offer.type},
+                                                message="Offer created successfully")
+                else:
+                    return CustomBadRequest(message="Invalid data")
             else:
-                return CustomBadRequest(message="Invalid data")
+                return CustomBadRequest(message="this item doesnt belongs to your restaurant")
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
@@ -101,3 +108,4 @@ class OffersApproval(APIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return GenericException()
+        
