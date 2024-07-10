@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import  RestaurantAuthTokens, CustomerAuthTokens
+from .models import  AdministratorAuthTokens, RestaurantAuthTokens, CustomerAuthTokens
 
 
 class CustomerAuthTokenSerializer(serializers.ModelSerializer):
@@ -11,4 +11,9 @@ class CustomerAuthTokenSerializer(serializers.ModelSerializer):
 class RestaurantAuthTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = RestaurantAuthTokens
+        fields = "__all__"
+
+class AdministratorAuthTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdministratorAuthTokens
         fields = "__all__"

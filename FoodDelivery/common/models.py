@@ -25,3 +25,11 @@ class RestaurantAuthTokens(models.Model):
     access_token = models.TextField(null=True, db_column="auth_access_token")
     refresh_token = models.TextField(null=True, db_column="auth_refresh_token")
     created_at = models.DateTimeField(auto_now_add=True)
+
+class AdministratorAuthTokens(models.Model):
+    class Meta:
+        db_table = 'fd_admin_auth_tokens'
+
+    access_token = models.TextField(null=True, db_column="auth_access_token")
+    refresh_token = models.TextField(null=True, db_column="auth_refresh_token")
+    created_at = models.DateTimeField(auto_now_add=True)
