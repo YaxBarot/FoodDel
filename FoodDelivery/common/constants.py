@@ -52,3 +52,12 @@ NO_SUCH_RESTAURANT_EXISTS = "No such restaurant exists"
 RATING_CANNOT_BE_GIVEN = "Rating cannot be given, please order from restaurant first"
 ONE_RATING_ALLOWED = "You have already Rated this Restaurant"
 RATING_GIVEN_SUCCESSFULLY = "You have successfully rated the restaurant"
+
+
+# offers
+
+OFFER_UNAVAILABLE = "This offer is currently unavailable"
+ONE_PROMOTION_ALLOWED = "Sorry, only one promotion is allowed for this cart"
+WE_COULDNT_APPLY_THE_PROMOTION = "Sorry, we couldn't apply the offer"
+ALREADY_APPLIED = "This offers is already applied"
+ORDER_HAS_ALREADY_BEEN_PLACED = "The order is already placed"
