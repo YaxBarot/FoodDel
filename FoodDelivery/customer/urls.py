@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .cart import AddToCart, Cartcheckout, DeleteInCart, GetCart
+from .cart import AddToCart, ApplyOffer, Cartcheckout, DeleteInCart, GetCart
 
 from .homepage import ShowRestaurantList
 
@@ -22,7 +22,7 @@ urlpatterns = [
     path('deleteincart/<int:cart_id>/', DeleteInCart.as_view()),
     path("getcart/", GetCart.as_view()),
     path("cartcheckout/", Cartcheckout.as_view()),
-
-    path("raterestaurant/",RateRestaurant.as_view())
+    path("raterestaurant/",RateRestaurant.as_view()),
+    path("applyoffer/<int:restaurant_id>/",ApplyOffer.as_view())
  
 ]
