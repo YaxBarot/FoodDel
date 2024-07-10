@@ -20,7 +20,6 @@ class OffersCreate(APIView):
         try:
             restaurant = request.user
             request.data["restaurant_id"] = restaurant.restaurant_id
-            print(request.data, request.data["restaurant_id"] )
             serializer = OffersSerializer(data=request.data)
 
             
@@ -33,7 +32,6 @@ class OffersCreate(APIView):
 
             if Offers.objects.filter(item_id__restaurant_id=restaurant.restaurant_id).exists():
                 
-
                 if serializer.is_valid(raise_exception=True):
                     offer = serializer.save()
                     return GenericSuccessResponse({'offer_id': offer.offer_id, 'type': offer.type},

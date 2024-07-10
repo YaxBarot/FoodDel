@@ -1,5 +1,7 @@
 import json
 
+from offers.models import Offers
+from offers.serializers import OffersSerializer
 from restaurant.models import RestaurantProfile
 from customer.serializers import CartSerializer, JSONMenuSerializer, RegistrationSerializer
 from restaurant.serializers import RegistrationSerializer as RestrauntRegistrationSerializer
@@ -236,3 +238,22 @@ class Cartcheckout(APIView):
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+class ApplyOffer(APIView):
+    authentication_classes = [CustomerJWTAuthentication]
+
+    def get(self, request, restaurant_id):
+        try:
+       
+            offer = Offers.objects.get(restaurant_id=restaurant_id)
+
+            offers_serializer = OffersSerializer(offer)
+            
+            return GenericSuccessResponse(offers_serializer.data, status=status.HTTP_200_OK)
+
+        except Offers.DoesNotExist:
+            return Response({"message": "offer not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+        except:
+            GenericException()

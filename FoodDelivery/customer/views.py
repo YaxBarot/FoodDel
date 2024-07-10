@@ -216,3 +216,5 @@ class GetRestaurantMenu(APIView):
        
         except Exception as e:
             GenericException() 
+
+
