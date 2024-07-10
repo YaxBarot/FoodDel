@@ -15,3 +15,4 @@ class Offers(Audit):
     type = models.CharField(max_length=225)
     is_approved = models.BooleanField(default=0)
     restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
+    allow_multiple_offers = models.BooleanField(default=0)
