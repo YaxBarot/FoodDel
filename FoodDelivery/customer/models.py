@@ -40,7 +40,7 @@ class Cart(Audit):
     menu_item = models.JSONField()
 
     total_price = models.CharField(max_length=255,default=0)
-
+    discounted_price = models.CharField(max_length=255, default=0)
     is_ordered = models.BooleanField(default=0)
     is_offer_applied = models.BooleanField(default=0)
 

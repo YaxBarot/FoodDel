@@ -246,7 +246,7 @@ class ApplyOffer(APIView):
     def get(self, request, restaurant_id):
         try:
             print(restaurant_id)
-            offers = Offers.objects.filter(restaurant_id=restaurant_id)
+            offers = Offers.objects.filter(restaurant_id=restaurant_id, is_approved=True)
 
             if offers.exists():
                 offers_serializer = OffersSerializer(offers, many=True)
