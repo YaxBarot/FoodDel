@@ -4,6 +4,7 @@ from common.models import Audit
 
 
 class RestaurantType(Enum):
+    ALL_TYPES = "All types"
     RESTRAUNT = "Restraunt"
     FAST_FOOD = "Fast Food"
     FAST_CASUAL = "Fast Casual"
@@ -45,6 +46,7 @@ class RestaurantProfile(Audit):
     rating = models.FloatField(default=0.0)
     no_of_ratings = models.IntegerField(default=0)
 
+    Restaurant_pic = models.ImageField(upload_to='Images/RestaurantPic',default="Screenshot 2024-07-12 214916.png", db_column="restaurant_pic", null=True, blank=True)
 
 class RestaurantOTP(Audit):
     class Meta:

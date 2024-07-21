@@ -1,5 +1,6 @@
 import re
 import random
+import traceback
 
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.views import APIView
@@ -16,7 +17,7 @@ from common.helpers import save_auth_tokens
 from common.models import CustomerAuthTokens
 from common.constants import (PASSWORD_LENGTH_SHOULD_BE_BETWEEN_8_TO_20, PASSWORD_MUST_HAVE_ONE_NUMBER,
                               PASSWORD_MUST_HAVE_ONE_SMALLERCASE_LETTER, PASSWORD_MUST_HAVE_ONE_UPPERCASE_LETTER,
-                              PASSWORD_MUST_HAVE_ONE_SPECIAL_CHARACTER, EMAIL_ALREADY_EXISTS,
+                              PASSWORD_MUST_HAVE_ONE_SPECIAL_CHARACTER, EMAIL_ALREADY_EXISTS, USER_LOGGED_IN_SUCCESSFULLY,
                               USER_REGISTERED_SUCCESSFULLY, BAD_REQUEST,
                               USER_LOGGED_OUT_SUCCESSFULLY, YOUR_PASSWORD_UPDATED_SUCCESSFULLY, OTP_DOESNT_MATCH,
                               MOBILE_NO_ALREADY_EXISTS,
@@ -31,7 +32,7 @@ from exceptions.generic_response import GenericSuccessResponse
 from security.customer_authorization import get_authentication_tokens, CustomerJWTAuthentication
 
 from .helpers import send_mail
-from .serializers import RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
+from .serializers import CartSerializer, RegistrationSerializer, ResetPasswordSerializer, OTPVerificationSerializer
 from .models import Customers, CustomerOTP
 from .helpers import validate_password
 
@@ -41,7 +42,7 @@ class Registration(APIView):
     def post(request):
         try:
             registration_serializer = RegistrationSerializer(data=request.data)
-
+           
             if "password" in request.data:
                 password = request.data["password"]
                 special_characters = r"[\$#@!\*]"
@@ -69,11 +70,27 @@ class Registration(APIView):
                 customer = registration_serializer.save()
                 authentication_tokens = get_authentication_tokens(customer)
                 save_auth_tokens(authentication_tokens)
+               
+                cart_data = {
+                    "id": customer.id,
+                    "menu_item": {},  
+                    "total_price": "0", 
+                    "discounted_price": "0",  
+                    "is_ordered": False,
+                    "is_offer_applied": False
+                }
+                cart_serializer = CartSerializer(data=cart_data)
+
+                if cart_serializer.is_valid():
+                    cart_serializer.save()
+
                 return GenericSuccessResponse(authentication_tokens, message=USER_REGISTERED_SUCCESSFULLY)
             else:
                 return CustomBadRequest(message=BAD_REQUEST)
+                
         except BadRequest as e:
             raise BadRequest(e.detail)
+        
         except Exception as e:
             return GenericException()
 
@@ -104,10 +121,11 @@ class Login(APIView):
                 raise ValidationError(detail="Incorrect password.")
             authentication_tokens = get_authentication_tokens(customer)
             save_auth_tokens(authentication_tokens)
-            return Response(data=authentication_tokens, status=200)
+            return GenericSuccessResponse(authentication_tokens, message=USER_LOGGED_IN_SUCCESSFULLY)
         except Customers.DoesNotExist:
             raise NotFound(detail="Email not found.")
         except Exception as e:
+            
             return Response(data={"message": "An unexpected error occurred."}, status=500)
 
 
@@ -190,7 +208,7 @@ class ForgotPassword(APIView):
                                 resetpassword_serializer.update(customer, resetpassword_serializer.validated_data)
                                 return GenericSuccessResponse('e', message=YOUR_PASSWORD_UPDATED_SUCCESSFULLY)
                     else:
-                        return CustomBadRequest(message=OTP_DOESNT_MATCH)
+                        return CustomBadRequest(message=OTP_DOESNT_MATCH)   
                 else:
                     return CustomBadRequest(message=OTP_EXPIRED)
             else:
@@ -201,20 +219,14 @@ class ForgotPassword(APIView):
 
 class GetRestaurantMenu(APIView):
     @staticmethod
-    def get(request):
+    def get(request, restaurant_id):
         try:
-            if "restaurant_id" not in request.data:
-                raise CustomBadRequest(message=BAD_REQUEST)
-            
-            restaurant_id = request.data["restaurant_id"]
             
             restaurant_menu = MenuItem.objects.filter(restaurant_id=restaurant_id, is_deleted=False)
-
-            restaurant_menu_serializer = RestaurantMenuSerializer(restaurant_menu, many=True) 
-           
-            return GenericSuccessResponse(restaurant_menu_serializer.data) 
-       
+            restaurant_menu_serializer = RestaurantMenuSerializer(restaurant_menu, many=True)
+         
+            return GenericSuccessResponse(restaurant_menu_serializer.data)
         except Exception as e:
-            GenericException() 
-
+           
+            return GenericException()
 

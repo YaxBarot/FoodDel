@@ -19,4 +19,5 @@ class MenuItem(Audit):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    item_pic = models.ImageField(upload_to='Images/ItemPic', db_column="item_pic", null=True, blank=True)
 

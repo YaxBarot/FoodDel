@@ -34,7 +34,7 @@ class Cart(Audit):
         db_table = "fd_cart"
     customer_cart_id = models.BigAutoField(primary_key=True)
 
-    restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE)
+    restaurant_id = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE, null=True)
     id = models.ForeignKey(Customers, on_delete=models.CASCADE)
 
     menu_item = models.JSONField()

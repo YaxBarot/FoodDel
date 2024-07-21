@@ -21,7 +21,7 @@ class OTPVerificationSerializer(serializers.ModelSerializer):
 class RestaurantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RestaurantProfile
-        fields = ["restaurant_id","restaurant_name","Restaurant_type","address"]
+        fields = ["restaurant_id","restaurant_name","Restaurant_type","address","operational_status","rating","no_of_ratings","Restaurant_pic"]
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,7 +40,8 @@ class JSONMenuSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=500, allow_blank=True, allow_null=True)
     price = serializers.CharField(max_length=100)
-    quantity     = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    item_pic = serializers.CharField(max_length=255)
 
 
 

@@ -1,4 +1,4 @@
-import traceback
+
 from customer.serializers import CartSerializer
 from security.administration_authorization import AdministratorJWTAuthentication
 from rest_framework.views import APIView
@@ -13,8 +13,7 @@ from exceptions.generic import CustomBadRequest, BadRequest, GenericException
 from exceptions.generic_response import GenericSuccessResponse
 from security.restaurant_authorization import RestaurantJWTAuthentication
 from security.customer_authorization import CustomerJWTAuthentication
-from common.constants import BAD_REQUEST, OFFER_UNAVAILABLE, ONE_PROMOTION_ALLOWED, WE_COULDNT_APPLY_THE_PROMOTION, \
-    ALREADY_APPLIED, ORDER_HAS_ALREADY_BEEN_PLACED
+
 from customer.models import Cart, OffersHistory
 
 
@@ -74,7 +73,6 @@ class OffersCreate(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            traceback.print_exc()
             return GenericException()
 
 
@@ -169,6 +167,7 @@ class ApplyPromotions(APIView):
                 cart.is_offer_applied = True
                 cart.save()
                 return GenericSuccessResponse(CartSerializer(cart).data, message="Offer applied successfully.")
+           
             else:
                 if offer.discount != 0:
                     if str(offer.item_id.menu_id) in cart.menu_item:
@@ -178,6 +177,7 @@ class ApplyPromotions(APIView):
                         return GenericSuccessResponse(CartSerializer(cart).data, message="Offer applied successfully.")
                     else:
                         return CustomBadRequest(message="Offer not applicable to cart items.")
+               
                 else:
                     if str(offer.item_id.menu_id) in cart.menu_item and str(offer.free_item.menu_id) in cart.menu_item:
                         cart_item_quantity = int(cart.menu_item[str(offer.item_id.menu_id)]["quantity"])
@@ -191,9 +191,7 @@ class ApplyPromotions(APIView):
                         
                         while cart_item_quantity >= int(offer.item_quantity) and cart_free_item_quantity >= int(offer.free_item_quantity):
                             cart.discounted_price = float(cart.discounted_price) - offer.free_item_quantity * float(cart.menu_item[str(offer.free_item.menu_id)]["price"])
-                            print("cart.discounted_price",cart.discounted_price)
-                            print("cart_free_item_quantity",cart_free_item_quantity)
-                            print("float(cart.menu_item[str(offer.free_item.menu_id)]['price'])",float(cart.menu_item[str(offer.free_item.menu_id)]["price"]))
+
                             if offer.item_id == offer.free_item:
 
                                 cart_item_quantity = cart_item_quantity - offer.item_quantity - offer.free_item_quantity
@@ -216,5 +214,4 @@ class ApplyPromotions(APIView):
         except Cart.DoesNotExist:
             return CustomBadRequest(message="Cart does not exist.")
         except Exception as e:
-            traceback.print_exc()
             return GenericException()

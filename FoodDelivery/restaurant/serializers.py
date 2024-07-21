@@ -32,5 +32,4 @@ class CartItemSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     menu_item = serializers.JSONField()
     total_price = serializers.CharField(max_length=255)
-    is_ordered = serializers.BooleanField()
-    
+    is_ordered = serializers.BooleanField() 

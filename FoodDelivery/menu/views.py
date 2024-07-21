@@ -1,11 +1,8 @@
-import traceback
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import MenuCategory, MenuItem
 from .serializers import MenuCategorySerializer, MenuItemSerializer, MenuItemavailablitySerializer
-from exceptions.generic import CustomBadRequest, BadRequest, GenericException
+from exceptions.generic import CustomBadRequest, GenericException
 from exceptions.generic_response import GenericSuccessResponse
 
 from security.restaurant_authorization import RestaurantJWTAuthentication
@@ -32,7 +29,7 @@ class MenuCategoryCreate(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            print(f"An error occurred: {e}")
+
             return GenericException()
 
 
@@ -62,7 +59,7 @@ class MenuCategoryUpdate(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            print(f"An error occurred: {e}")
+     
             return GenericException()
 
 class MenuCategoryDelete(APIView):
@@ -78,7 +75,7 @@ class MenuCategoryDelete(APIView):
             menu_category.delete()
             return GenericSuccessResponse(message="Category deleted successfully")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            
             return GenericException()
         
 class MenuItemCreate(APIView):
@@ -104,7 +101,7 @@ class MenuItemCreate(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            print(f"An error occurred: {e}")
+          
             return GenericException()
 
 class MenuItemUpdate(APIView):
@@ -127,7 +124,7 @@ class MenuItemUpdate(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            print(f"An error occurred:{e}")
+           
             return GenericException()
 
 class MenuItemDelete(APIView):
@@ -141,7 +138,7 @@ class MenuItemDelete(APIView):
         except MenuItem.DoesNotExist:
             return CustomBadRequest(message="Item not found")
         except Exception as e:
-            print(f"An error occurred: {e}")
+           
             return GenericException()
 
 class MenuItemavailablity(APIView):
@@ -173,7 +170,7 @@ class MenuItemavailablity(APIView):
         except ValidationError as e:
             return CustomBadRequest(message=e.detail)
         except Exception as e:
-            traceback.print_exc()
+           
             return GenericException()
 
         

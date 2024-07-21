@@ -14,9 +14,10 @@ class MenuItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RestaurantMenuSerializer(serializers.ModelSerializer):
+    category = MenuCategorySerializer(read_only=True, source='category_id')
     class Meta:
         model = MenuItem
-        fields = "__all__"
+        fields = ["restaurant_id","menu_id","name","description","price","item_pic","category"]
 
 class MenuItemavailablitySerializer(serializers.ModelSerializer):
     class Meta:

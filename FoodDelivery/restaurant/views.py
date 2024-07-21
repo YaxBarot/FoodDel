@@ -1,6 +1,6 @@
-from django.shortcuts import render
+
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
 
 from django.db.models import Q
 from customer.serializers import CartSerializer
@@ -9,10 +9,12 @@ from security.customer_authorization import CustomerJWTAuthentication
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+
 from django.contrib.auth.hashers import make_password, check_password
 
 import datetime
-import smtplib
+
 import traceback
 import pytz
 import re
@@ -47,10 +49,12 @@ from .serializers import CartItemSerializer, OperationalStatusSerializer, Regist
 
 
 class Registration(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     @staticmethod
     def post(request):
         try:
             registration_serializer = RegistrationSerializer(data=request.data)
+            #parser_classes = (MultiPartParser, FormParser)
 
             if "email" in request.data and RestaurantProfile.objects.filter(email=request.data["email"],
                                                                         is_deleted=False).exists():
@@ -90,9 +94,11 @@ class Registration(APIView):
                 return GenericSuccessResponse(authentication_tokens, message=USER_REGISTERED_SUCCESSFULLY)
             
             else:
-                return CustomBadRequest(message=BAD_REQUEST)
+
+                return CustomBadRequest(message=registration_serializer.errors)
 
         except Exception as e:
+      
             return GenericException()
 
 
@@ -268,16 +274,7 @@ class ForgotPassword(APIView):
 
 
 
-class GetRestaurantType(APIView):
-    @staticmethod
-    def get(request):
-        try:
-            restaurant_type_choices = RestaurantType.choices()
-            response = {choice[0]: choice[1] for choice in restaurant_type_choices}
-          
-            return GenericSuccessResponse(response)        
-        except:
-            GenericException()
+
         
 class OperationalStatus(APIView):
 
@@ -295,7 +292,7 @@ class OperationalStatus(APIView):
         except RestaurantProfile.DoesNotExist:
             return Response({"message": "RestaurantProfile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            traceback.print_exc()
+    
             return GenericException()
 
 
@@ -307,14 +304,10 @@ class OperationalStatus(APIView):
                 raise CustomBadRequest(message="BAD_REQUEST")
             
             operational_status_serializer = OperationalStatusSerializer(data=request.data)
-            restaurant = RestaurantProfile.objects.get(restaurant_id=restaurant.restaurant_id)
-
-            print(restaurant)
-            print(request.data)
-            print(operational_status_serializer)    
+            restaurant = RestaurantProfile.objects.get(restaurant_id=restaurant.restaurant_id)  
 
             if operational_status_serializer.is_valid():
-                print("Valid data received")
+
                 operational_status_serializer.update(restaurant, operational_status_serializer.validated_data)
               
                 return GenericSuccessResponse('e', message="Your operational status has been updated successfully.")

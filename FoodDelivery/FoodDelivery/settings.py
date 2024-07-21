@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,6 +19,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+
+
+MEDIA_URL = "/Media/"
+MEDIA_ROOT=os.path.join(BASE_DIR,"Media")
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-(10iwm%8m-_6s@=+6x&vk2y0a^v7u%kjwwyi459u%m0%=yz*bw"
@@ -38,12 +45,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     'rest_framework',
     "customer",
     "restaurant",
     "common",
     "menu",
     "offers",
+    "administrator"
 ]
 
 MIDDLEWARE = [
@@ -54,7 +63,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "FoodDelivery.urls"
 
@@ -83,7 +95,7 @@ WSGI_APPLICATION = "FoodDelivery.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fd',
+        'NAME': 'fd1',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
